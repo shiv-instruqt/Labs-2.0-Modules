@@ -1,15 +1,14 @@
 # -----------------------------------------------------------------------------
 # Tabs owned by the lab.
 #
-# Most tabs in this lab come from the modules (see modules/*/tabs.hcl). These
-# two show the other pattern: a lab-level tab that targets a module's resource
-# through the module's output.
+# TEST VARIANT (no modules): the terminal and service tabs that used to ship
+# inside the modules are defined here directly.
 # -----------------------------------------------------------------------------
 
 # Code editor opened on the load balancer's nginx config directory.
 resource "editor" "lb_config" {
   workspace "nginx_config" {
-    target    = module.lb.output.container
+    target    = resource.container.lb
     directory = "/etc/nginx/conf.d"
   }
 }
@@ -17,4 +16,43 @@ resource "editor" "lb_config" {
 # Reference card for the module syntax used in this lab.
 resource "note" "cheatsheet" {
   file = "notes/module-cheatsheet.md"
+}
+
+resource "terminal" "lb" {
+  target            = resource.container.lb
+  shell             = "/bin/bash"
+  working_directory = "/etc/nginx/conf.d"
+}
+
+resource "service" "lb" {
+  target = resource.container.lb
+  scheme = "http"
+  port   = 80
+  path   = "/"
+}
+
+resource "terminal" "blue" {
+  target            = resource.container.blue
+  shell             = "/bin/bash"
+  working_directory = "/usr/share/nginx/html"
+}
+
+resource "service" "blue" {
+  target = resource.container.blue
+  scheme = "http"
+  port   = 80
+  path   = "/"
+}
+
+resource "terminal" "green" {
+  target            = resource.container.green
+  shell             = "/bin/bash"
+  working_directory = "/usr/share/nginx/html"
+}
+
+resource "service" "green" {
+  target = resource.container.green
+  scheme = "http"
+  port   = 80
+  path   = "/"
 }

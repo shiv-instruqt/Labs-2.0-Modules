@@ -1,3 +1,5 @@
+> **TEST VARIANT: no modules.** Same lab as `main`, but the `modules/` folder and every `module` block/reference are removed. The blue, green and lb containers and their tabs are defined directly in `sandbox.hcl` and `tabs.hcl`. Use it to check whether the lab opens without modules. The instruction pages still describe the module version.
+
 # Blue/Green Deployments, Built from Modules
 
 An Instruqt 2.0 lab that shows how **modules** work by using them to build a real scenario. Learners run a blue/green release on nginx. Authors reading the repo see modules used for reuse, inputs, outputs, chaining and isolation.
