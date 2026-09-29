@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
-# Tasks. Script paths resolve from the lab root. TEST VARIANT (no modules):
-# task targets are the lab's own containers.
+# Tasks. Script paths resolve from the lab root. Task targets that live inside
+# a module are reached through the module's outputs.
 # -----------------------------------------------------------------------------
 
 # Chapter 2, page 1: find out which instance is live.
@@ -9,7 +9,7 @@ resource "task" "identify_live" {
   success_message = "Correct. Blue is live and green is on standby, ready for the release."
 
   config {
-    target  = resource.container.lb
+    target  = module.lb.output.container
     timeout = "15s"
 
     environment = {
@@ -50,7 +50,7 @@ resource "task" "switch_to_green" {
   success_message = "Traffic is now on green 2.0.0. Blue is still running, so rollback is one line away."
 
   config {
-    target  = resource.container.lb
+    target  = module.lb.output.container
     timeout = "20s"
   }
 
@@ -88,7 +88,7 @@ resource "task" "hotfix_green" {
   success_message = "Hotfix is live. You changed one module instance and left the other untouched."
 
   config {
-    target  = resource.container.green
+    target  = module.green.output.container
     timeout = "15s"
 
     environment = {
@@ -113,7 +113,7 @@ resource "task" "hotfix_green" {
     description = "The load balancer serves the hotfix to users"
 
     config {
-      target = resource.container.lb
+      target = module.lb.output.container
     }
 
     check {

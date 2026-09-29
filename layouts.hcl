@@ -1,5 +1,7 @@
 # -----------------------------------------------------------------------------
-# Layouts. TEST VARIANT (no modules): every tab target is a lab resource.
+# Layouts. Tabs that come from a module are placed with
+#   target = module.<block>.output.<output>
+# which is the only way a lab can address something inside a module.
 # -----------------------------------------------------------------------------
 
 # Hands-on layout (the lab default): instructions on the left, shells on the
@@ -19,7 +21,7 @@ resource "layout" "workbench" {
 
       tab "lb_shell" {
         title  = "Load balancer"
-        target = resource.terminal.lb
+        target = module.lb.output.terminal
         active = true
       }
 
@@ -30,12 +32,12 @@ resource "layout" "workbench" {
 
       tab "blue_shell" {
         title  = "Blue shell"
-        target = resource.terminal.blue
+        target = module.blue.output.terminal
       }
 
       tab "green_shell" {
         title  = "Green shell"
-        target = resource.terminal.green
+        target = module.green.output.terminal
       }
 
       tab "cheatsheet" {
@@ -49,18 +51,18 @@ resource "layout" "workbench" {
 
       tab "live_site" {
         title  = "Live site"
-        target = resource.service.lb
+        target = module.lb.output.service
         active = true
       }
 
       tab "blue_site" {
         title  = "Blue (direct)"
-        target = resource.service.blue
+        target = module.blue.output.service
       }
 
       tab "green_site" {
         title  = "Green (direct)"
-        target = resource.service.green
+        target = module.green.output.service
       }
     }
   }
@@ -85,7 +87,7 @@ resource "layout" "reading" {
 
     tab "live_site" {
       title  = "Live site"
-      target = resource.service.lb
+      target = module.lb.output.service
     }
   }
 }

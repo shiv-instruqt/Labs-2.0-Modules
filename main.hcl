@@ -1,9 +1,58 @@
 # =============================================================================
-# TEST VARIANT: the same lab with NO modules.
-# Everything the modules used to create now lives directly in sandbox.hcl and
-# tabs.hcl. If this branch opens and the modules branch does not, the module
-# loading path is what breaks the lab.
+# Blue/Green Deployments, Built from Modules
+#
+# This file is the entrypoint. It does two things:
+#   1. Pulls in the modules that build the lab (the module blocks below).
+#   2. Defines the one `lab` resource: settings, default layout and content.
+#
+# Only top-level .hcl files are loaded automatically. Everything under
+# modules/ is loaded only because a module block points at it.
 # =============================================================================
+
+# --- Modules -----------------------------------------------------------------
+
+# The SAME module used twice. Each block gets its own copy of every resource
+# inside, namespaced by the block name, so "blue" and "green" never collide.
+module "blue" {
+  source = "./modules/web-app"
+
+  variables = {
+    name         = "blue"
+    version      = variable.blue_version
+    accent_color = "#2563eb"
+    network_id   = resource.network.main.meta.id
+    ip_address   = "10.0.200.11"
+  }
+}
+
+module "green" {
+  source = "./modules/web-app"
+
+  variables = {
+    name         = "green"
+    version      = variable.green_version
+    accent_color = "#16a34a"
+    network_id   = resource.network.main.meta.id
+    ip_address   = "10.0.200.12"
+  }
+}
+
+# Module CHAINING: the load balancer's inputs are the web-app modules' outputs.
+# The platform works out the order for you: blue and green are created first.
+module "lb" {
+  source = "./modules/load-balancer"
+
+  variables = {
+    network_id     = resource.network.main.meta.id
+    ip_address     = "10.0.200.10"
+    active_backend = variable.live_color
+
+    backends = {
+      blue  = module.blue.output.address
+      green = module.green.output.address
+    }
+  }
+}
 
 # --- Lab ---------------------------------------------------------------------
 
